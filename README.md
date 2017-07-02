@@ -19,10 +19,11 @@ const gulp = require("gulp");
 const iconeer = require("gulp-iconeer");
 
 gulp.task("build-icons", function() {
-    gulp.src("/icons/*.svg")
+    gulp.src("./icons/*.svg")
         .pipe(iconeer({
             id: "MyAwesomeFont",
-            family: "My Awesome Font"
+            family: "My Awesome Font",
+            prefix: "awesome"
         }))
         .pipe(gulp.dest("./bundle"));
 });

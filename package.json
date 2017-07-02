@@ -1,16 +1,17 @@
 {
   "name": "gulp-iconeer",
-  "version": "0.1.1",
+  "version": "0.1.22",
   "description": "A fontkit packer for svg icons",
   "main": "index.js",
   "author": "Frank Wolbring <fwolbring@googlemail.com>",
   "license": "MIT",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/fwolle30/gulp-iconeer"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fwolle30/gulp-iconeer"
   },
   "dependencies": {
     "libxmljs": "^0.18.7",
+    "moustache": "0.0.2",
     "through2": "^2.0.3",
     "vinyl": "^2.1.0",
     "xml2js": "^0.4.17"

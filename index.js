@@ -4,6 +4,34 @@ const gulp = require("gulp");
 const through = require("through2");
 const File = require("vinyl");
 const path = require("path");
+const moustache = require("moustache");
+
+var cssTemplate = "@font-face { \n\
+    font-family: '{{font-family}}'; \n\
+\n\
+    src: url('../fonts/{{font-id}}.woff2') format('woff2'); \n\
+         url('../fonts/{{font-id}}.woff') format('woff'), \n\
+         url('../fonts/{{font-id}}.ttf') format('truetype'); \n\
+\n\
+    font-weight: normal; \n\
+    font-style: normal; \n\
+} \n\
+\n\
+.{{css-prefix}} { \n\
+    display: inline-block; \n\
+    font: normal normal normal 14px/1 '{{font-family}}'; \n\
+    font-size: inherit; \n\
+    text-rendering: auto; \n\
+    -webkit-font-smoothing: antialiased; \n\
+    -moz-osx-font-smoothing: grayscale; \n\
+}\n\
+\n\
+{{#glyphs}}{{>glyph}}{{/glyphs}}";
+
+var cssGlyphTemplate = ".{{css-prefix}}-{{name}}:before { \n\
+    content: '\\{{charcode}}';\n\
+}\n\
+\n";
 
 function getGlyphs(obj) {
     var out = [];
@@ -31,7 +59,8 @@ function packFont(options) {
 
     var opts = options || {
             id: (new Date()).getTime(),
-            family: "Your Font"
+            family: "Your Font",
+            prefix: "font"
         };
 
     function readSVG(file, enc, cb) {
@@ -53,7 +82,7 @@ function packFont(options) {
         });
     }
 
-    function createSVG(cb) {
+    function createSVG(ctx) {
         var fontPrepared = [];
         font.forEach(function(glyph) {
             fontPrepared.push({
@@ -104,12 +133,50 @@ function packFont(options) {
             contents: Buffer.from(outXML)
         });
 
-        this.push(outFile);
+        ctx.push(outFile);
+    }
+
+    function createCSS(ctx) {
+        var model = {
+            "font-family": opts.family,
+            "font-id": opts.id,
+            "css-prefix": opts.prefix
+        };
+
+        var glyphs = [];
+
+        font.forEach(function(glyph) {
+            var charCode = glyph.unicode.charCodeAt().toString(16);
+            var glyphName = glyph["glyph-name"];
+
+            glyphs.push({
+                name: glyphName,
+                charcode: charCode
+            });
+        });
+
+        model.glyphs = glyphs;
+
+        var css = moustache.render(cssTemplate, model, {
+            "glyph": cssGlyphTemplate
+        });
+
+        var outFile = new File({
+            path: './css/' + opts.id + '.css',
+            contents: Buffer.from(css)
+        });
+
+        ctx.push(outFile);
+    }
+
+    function createPack(cb) {
+        createSVG(this);
+        createCSS(this);
 
         cb();
     }
 
-    return through.obj(readSVG, createSVG);
+    return through.obj(readSVG, createPack);
 }
 
 module.exports =  packFont;
