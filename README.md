@@ -32,4 +32,3 @@ gulp.task("build-icons", function() {
 Planned features:
 --------
 - Conversion of the svg File to a fontpack
-- Auto creating CSS file
