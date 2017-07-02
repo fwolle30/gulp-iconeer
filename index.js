@@ -96,13 +96,11 @@ function packFont(options) {
             }
         };
 
-        console.log(xml);
-
         var builder = new xml2js.Builder();
         var outXML = builder.buildObject(xml);
 
         var outFile = new File({
-            path: './fonts/out.svg',
+            path: './fonts/' + opts.id + '.svg',
             contents: Buffer.from(outXML)
         });
 
@@ -114,4 +112,4 @@ function packFont(options) {
     return through.obj(readSVG, createSVG);
 }
 
-var exports =  packFont;
+module.exports =  packFont;

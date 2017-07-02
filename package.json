@@ -1,6 +1,6 @@
 {
   "name": "gulp-iconeer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A fontkit packer for svg icons",
   "main": "index.js",
   "author": "Frank Wolbring <fwolbring@googlemail.com>",

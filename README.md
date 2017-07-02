@@ -20,11 +20,11 @@ const iconeer = require("gulp-iconeer");
 
 gulp.task("build-icons", function() {
     gulp.src("/icons/*.svg")
-      .pipe(iconeer({
-        id: "MyAwesomeFont",
-        family: "My Awesome Font"
-      }))
-      .pipe(gulp.dest("/bundle"));
+        .pipe(iconeer({
+            id: "MyAwesomeFont",
+            family: "My Awesome Font"
+        }))
+        .pipe(gulp.dest("./bundle"));
 });
 ```
 
