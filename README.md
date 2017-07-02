@@ -23,7 +23,10 @@ gulp.task("build-icons", function() {
         .pipe(iconeer({
             id: "MyAwesomeFont",
             family: "My Awesome Font",
-            prefix: "awesome"
+            prefix: "awesome",
+            copyright: "Frank Wolbring",
+            timestamp: (new Date()).getTime() / 1000,
+            version: "1.0"
         }))
         .pipe(gulp.dest("./bundle"));
 });

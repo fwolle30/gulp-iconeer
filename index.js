@@ -5,6 +5,7 @@ const through = require("through2");
 const File = require("vinyl");
 const path = require("path");
 const moustache = require("moustache");
+const svg2ttf = require("svg2ttf");
 
 var cssTemplate = "@font-face { \n\
     font-family: '{{font-family}}'; \n\
@@ -57,11 +58,30 @@ function getGlyphs(obj) {
 function packFont(options) {
     var font = [];
 
-    var opts = options || {
-            id: (new Date()).getTime(),
-            family: "Your Font",
-            prefix: "font"
-        };
+    var defaults = {
+        id: (new Date()).getTime(),
+        family: "Your Font",
+        prefix: "font",
+        copyright: "your-name",
+        timestamp: (new Date()).getTime() / 1000,
+        version: "1.0"
+    };
+
+    var opts = {};
+
+    if (options instanceof Object) {
+        Object.keys(defaults)
+            .forEach(function(key) {
+                opts[key] = defaults[key];
+            });
+
+        Object.keys(options)
+            .forEach(function(key) {
+                opts[key] = options[key];
+            });
+    } else {
+        opts = defaults
+    }
 
     function readSVG(file, enc, cb) {
         if (file.isStream() || path.basename(file.path).startsWith("_")) {
@@ -72,9 +92,11 @@ function packFont(options) {
         xml2js.parseString(file.contents.toString(), function(err, result) {
             // console.log(JSON.stringify(result));
             var glyphs = getGlyphs(result);
+            var index = 0;
 
             glyphs.forEach(function(glyph) {
-                delete glyph.id;
+                glyph.id = "fnt" + (index++);
+
                 font.push(glyph);
             });
 
@@ -134,6 +156,8 @@ function packFont(options) {
         });
 
         ctx.push(outFile);
+
+        return outXML;
     }
 
     function createCSS(ctx) {
@@ -169,8 +193,24 @@ function packFont(options) {
         ctx.push(outFile);
     }
 
+    function createTTF(svg, ctx) {
+        var ttf = svg2ttf(svg, {
+            copyright: opts.copyright,
+            ts: opts.timestamp,
+            version: opts.version
+        });
+
+        var outFile = new File({
+            path: './fonts/' + opts.id + '.ttf',
+            contents: new Buffer.from(ttf.buffer)
+        });
+
+        ctx.push(outFile);
+    }
+
     function createPack(cb) {
-        createSVG(this);
+        var svg = createSVG(this);
+        createTTF(svg, this);
         createCSS(this);
 
         cb();
