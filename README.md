@@ -31,7 +31,3 @@ gulp.task("build-icons", function() {
         .pipe(gulp.dest("./bundle"));
 });
 ```
-
-Planned features:
---------
-- Conversion of the svg File to a fontpack
